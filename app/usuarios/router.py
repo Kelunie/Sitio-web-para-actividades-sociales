@@ -1,0 +1,1 @@
+# Endpoints (/usuarios/login, /usuarios/registro entre otros) para la gestión de usuarios, incluyendo autenticación y registro.
