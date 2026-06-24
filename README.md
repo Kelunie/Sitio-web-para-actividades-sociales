@@ -17,10 +17,10 @@ Este repositorio contiene únicamente el backend para el sitio web de actividade
   - `config.py` - configuración de la aplicación.
   - `database.py` - conexión y manejo de la base de datos.
   - `main.py` - punto de entrada de la aplicación FastAPI.
-  - `actividades/` - módulo para funcionalidades de actividades.
-    - `router.py` - rutas de actividades.
-    - `schemas.py` - esquemas Pydantic para actividades.
-    - `services.py` - lógica de negocio de actividades.
+  - `actividades/` - módulo básico de actividades. La lógica completa de actividades se desarrolla en otra historia.
+    - `router.py` - rutas básicas de actividades.
+    - `schemas.py` - esquemas Pydantic de actividades.
+    - `services.py` - stubs de servicio de actividades.
   - `usuarios/` - módulo para funcionalidades de usuarios.
     - `router.py` - rutas de usuarios.
     - `schemas.py` - esquemas Pydantic para usuarios.
@@ -71,5 +71,95 @@ http://localhost:8000
 ```
 http://localhost:8000/docs
 ```
+
+## Variables de entorno
+
+El proyecto usa un archivo `.env` local para la configuración de MongoDB.
+No debe subirse el archivo `.env` al repositorio.
+
+Ejemplo de `.env`:
+
+```env
+MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net
+DATABASE_NAME=metodologiasutn_db
+```
+
+Asegúrate de reemplazar `<usuario>`, `<contraseña>` y `<cluster>` por tus valores reales en tu entorno local.
+
+## Rutas principales
+
+### `GET /`
+- Descripción: devuelve un mensaje de bienvenida.
+- Respuesta:
+```json
+{"mensaje": "Hola Mundo"}
+```
+
+### `GET /health`
+- Descripción: verifica la conexión con MongoDB.
+- Respuesta exitosa:
+```json
+{"status": "ok", "message": "Conexión a la base de datos exitosa"}
+```
+
+### `GET /usuarios/`
+- Descripción: lista todos los usuarios registrados.
+- Respuesta:
+```json
+[
+  {
+    "id": "647b8f4a...",
+    "nombre": "Juan Pérez",
+    "email": "juan@example.com"
+  }
+]
+```
+
+### `POST /usuarios/registro`
+- Descripción: registra un nuevo usuario.
+- Body `application/json`:
+```json
+{
+  "nombre": "Juan Pérez",
+  "email": "juan@example.com",
+  "password": "MiClaveSegura123"
+}
+```
+- Respuesta exitosa `201 Created`:
+```json
+{
+  "id": "647b8f4a...",
+  "nombre": "Juan Pérez",
+  "email": "juan@example.com"
+}
+```
+- Error si el email ya existe:
+```json
+{"detail": "El email ya está registrado"}
+```
+
+### `POST /usuarios/login`
+- Descripción: inicia sesión con email y contraseña.
+- Body `application/json`:
+```json
+{
+  "email": "juan@example.com",
+  "password": "MiClaveSegura123"
+}
+```
+- Respuesta exitosa:
+```json
+{
+  "id": "647b8f4a...",
+  "nombre": "Juan Pérez",
+  "email": "juan@example.com"
+}
+```
+- Error si las credenciales son inválidas `401 Unauthorized`:
+```json
+{"detail": "Email o contraseña incorrectos"}
+```
+
+> Las rutas de actividades existen en el código, pero la US actual cubre sólo la creación/registro de usuarios e inicio de sesión.
 
 > Nota: Este repositorio no incluye frontend; está dedicado al desarrollo del backend con FastAPI.
