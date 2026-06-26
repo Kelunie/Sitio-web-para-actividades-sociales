@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 from app.usuarios import schemas, services
 from app.auth import crear_token
 
@@ -27,7 +27,7 @@ def registrar_usuario(usuario: schemas.UsuarioCreate):
     response_model=schemas.Token,
     summary="Iniciar sesión",
 )
-def iniciar_sesion(credentials: schemas.UsuarioLogin):
+def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
     usuario = services.autenticar_usuario(credentials.email, credentials.password)
     if not usuario:
         raise HTTPException(

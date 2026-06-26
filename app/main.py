@@ -1,10 +1,13 @@
 # Punto de entrada de la aoplicación
 from fastapi import FastAPI
+from starlette.middleware.sessions import SessionMiddleware
 from app.actividades.router import router as actividades_router
+from app.config import SECRET_KEY
 from app.usuarios.router import router as usuarios_router
 from app.database import client
 
 app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 app.include_router(actividades_router)
 app.include_router(usuarios_router)
 
