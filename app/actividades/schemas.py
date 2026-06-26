@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel 
+from datetime import date, datetime
+from pydantic import field_validator
 from typing import Literal, Optional
 
 
@@ -26,6 +28,26 @@ class EventoBase(BaseModel):
     descripcion: str
     capacidad: Optional[int] = None
     estado: Optional[EstadoEvento] = "disponible"
+    @field_validator("nombre", "lugar", "descripcion")
+    @classmethod
+    def campo_obligatorio_no_vacio(cls, valor, info):
+        if valor is None or not valor.strip():
+            raise ValueError(f"El campo '{info.field_name}' es obligatorio")
+        return valor.strip()
+
+    @field_validator("fecha")
+    @classmethod
+    def validar_fecha(cls, valor):
+        if valor is None or not valor.strip():
+            raise ValueError("La fecha es obligatoria")
+        valor = valor.strip()
+        try:
+            fecha_evento = datetime.strptime(valor, "%Y-%m-%d").date()
+        except ValueError:
+            raise ValueError("La fecha no es válida, debe tener el formato YYYY-MM-DD")
+        if fecha_evento < date.today():
+            raise ValueError("La fecha no puede ser anterior al día de hoy")
+        return valor
 
 
 class EventoCreate(EventoBase):
