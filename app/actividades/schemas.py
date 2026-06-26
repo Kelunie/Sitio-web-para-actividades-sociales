@@ -28,7 +28,7 @@ class EventoBase(BaseModel):
     descripcion: str
     capacidad: Optional[int] = None
     estado: Optional[EstadoEvento] = "disponible"
-    @field_validator("nombre", "lugar")
+    @field_validator("nombre", "lugar", "descripcion")
     @classmethod
     def campo_obligatorio_no_vacio(cls, valor, info):
         if valor is None or not valor.strip():
