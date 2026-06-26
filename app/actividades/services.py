@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, status
 from app.database import db
 from app.actividades import schemas
 
@@ -44,16 +44,15 @@ def get_eventos():
     return eventos
 
 
-def crear_evento(evento: schemas.EventoCreate, request: Request):
+def crear_evento(evento: schemas.EventoCreate, usuario: dict):
     evento_data = evento.dict(exclude_none=True)
-    usuario = request.session.get("usuario")
     if not usuario:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Debe iniciar sesión para crear un evento",
         )
 
-    evento_data["creado_por"] = usuario.get("id")
+    evento_data["creado_por"] = usuario.get("id") or usuario.get("email")
 
     result = db[EVENTOS_COLLECTION_NAME].insert_one(evento_data)
     return {

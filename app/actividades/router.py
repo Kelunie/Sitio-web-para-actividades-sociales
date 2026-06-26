@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Depends, status
+from app.auth import get_current_user
 from app.actividades import schemas, services
 
 
@@ -31,9 +32,9 @@ def listar_eventos():
 )
 def crear_evento(
     evento: schemas.EventoCreate,
-    request: Request,
+    usuario=Depends(get_current_user),
 ):
-    return services.crear_evento(evento, request)
+    return services.crear_evento(evento, usuario)
 
 
 router.include_router(eventos_router)
