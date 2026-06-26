@@ -2,15 +2,6 @@ from fastapi import HTTPException, status
 from app.database import db
 from app.actividades import schemas
 
-def get_actividades():
-    # Implementación pendiente del business logic de actividades
-    return []
-
-
-def crear_actividad(actividad):
-    # Implementación pendiente del business logic de actividades
-    return {"detail": "Pendiente implementación"}
-
 
 ACTIVIDADES_COLLECTION_NAME = "actividades"
 EVENTOS_COLLECTION_NAME = "eventos"
