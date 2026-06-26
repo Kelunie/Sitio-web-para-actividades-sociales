@@ -54,19 +54,19 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-4. Ejecutar la aplicación con Uvicorn:
+5. Ejecutar la aplicación con Uvicorn:
 
 ```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-5. Probar la API en el navegador o con herramientas como Postman en:
+6. Probar la API en el navegador o con herramientas como Postman en:
 
 ```
 http://localhost:8000
 ```
 
-6. Documentación automática de FastAPI:
+7. Documentación automática de FastAPI:
 
 ```
 http://localhost:8000/docs
@@ -77,14 +77,7 @@ http://localhost:8000/docs
 El proyecto usa un archivo `.env` local para la configuración de MongoDB.
 No debe subirse el archivo `.env` al repositorio.
 
-Ejemplo de `.env`:
-
-```env
-MONGODB_URI=mongodb+srv://<usuario>:<contraseña>@<cluster>.mongodb.net
-DATABASE_NAME=metodologiasutn_db
-```
-
-Asegúrate de reemplazar `<usuario>`, `<contraseña>` y `<cluster>` por tus valores reales en tu entorno local.
+El archivo `.env` debe contener los valores de MongoDB que te compartieron para este proyecto.
 
 ## Rutas principales
 
@@ -140,6 +133,7 @@ Asegúrate de reemplazar `<usuario>`, `<contraseña>` y `<cluster>` por tus valo
 
 ### `POST /usuarios/login`
 - Descripción: inicia sesión con email y contraseña.
+- La sesión queda guardada en la cookie del navegador para poder crear eventos sin reenviar correo ni id.
 - Body `application/json`:
 ```json
 {
@@ -160,6 +154,46 @@ Asegúrate de reemplazar `<usuario>`, `<contraseña>` y `<cluster>` por tus valo
 {"detail": "Email o contraseña incorrectos"}
 ```
 
-> Las rutas de actividades existen en el código, pero la US actual cubre sólo la creación/registro de usuarios e inicio de sesión.
+### `GET /actividades/eventos/`
+- Descripción: lista todos los eventos registrados.
+- Respuesta:
+```json
+[
+  {
+    "id": "647b8f4a...",
+    "nombre": "Taller de fotografía",
+    "fecha": "2026-07-01",
+    "lugar": "Auditorio central",
+    "descripcion": "Evento para compartir conocimientos",
+    "capacidad": 30,
+    "estado": "disponible"
+  }
+]
+```
 
-> Nota: Este repositorio no incluye frontend; está dedicado al desarrollo del backend con FastAPI.
+### `POST /actividades/eventos/crear`
+- Descripción: registra un nuevo evento.
+- Requiere que el usuario ya haya iniciado sesión.
+- Body `application/json`:
+```json
+{
+  "nombre": "Taller de fotografía",
+  "fecha": "2026-07-01",
+  "lugar": "Auditorio central",
+  "descripcion": "Evento para compartir conocimientos"
+}
+```
+- Respuesta exitosa `201 Created`:
+```json
+{
+  "id": "647b8f4a...",
+  "nombre": "Taller de fotografía",
+  "fecha": "2026-07-01",
+  "lugar": "Auditorio central",
+  "descripcion": "Evento para compartir conocimientos",
+  "capacidad": null,
+  "estado": "disponible"
+}
+```
+
+

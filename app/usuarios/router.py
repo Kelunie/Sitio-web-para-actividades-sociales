@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Request, status
 from app.usuarios import schemas, services
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
@@ -26,11 +26,12 @@ def registrar_usuario(usuario: schemas.UsuarioCreate):
     response_model=schemas.Usuario,
     summary="Iniciar sesión",
 )
-def iniciar_sesion(credentials: schemas.UsuarioLogin):
+def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
     usuario = services.autenticar_usuario(credentials.email, credentials.password)
     if not usuario:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email o contraseña incorrectos",
         )
+    request.session["usuario"] = usuario
     return usuario
