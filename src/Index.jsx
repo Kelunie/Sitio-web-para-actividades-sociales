@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-export default function Index({ user, onShow }) {
+export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
   const [eventos, setEventos] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -10,7 +10,7 @@ export default function Index({ user, onShow }) {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch('/actividades')
+        const response = await fetch('/actividades/eventos/')
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`)
         }
@@ -77,6 +77,11 @@ export default function Index({ user, onShow }) {
             <span className="section-label">Todos los eventos</span>
             <h3>Explora lo disponible</h3>
           </div>
+          {user && (
+            <button className="btn-primary" onClick={onCreateEvent}>
+              Crear evento
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -95,10 +100,10 @@ export default function Index({ user, onShow }) {
                 </div>
                 <p className="event-description">{evento.descripcion ?? 'Sin descripción disponible.'}</p>
                 <div className="event-meta">
-                  {evento.fecha && <span>📅 {evento.fecha}</span>}
-                  {evento.lugar && <span>📍 {evento.lugar}</span>}
+                  {evento.fecha && <span> {evento.fecha}</span>}
+                  {evento.lugar && <span>{evento.lugar}</span>}
                 </div>
-                <button className="btn-secondary">Ver detalles</button>
+                <button className="btn-secondary" onClick={() => onShowDetails(evento)}>Ver detalles</button>
               </article>
             ))}
           </div>
