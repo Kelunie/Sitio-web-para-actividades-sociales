@@ -9,6 +9,16 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
     const [estado, setEstado] = useState('disponible')
     const [message, setMessage] = useState(null)
     const [submitting, setSubmitting] = useState(false)
+    const hoy = new Date().toISOString().split('T')[0]
+
+    function extraerMensajeError(data, text) {
+        const detail = data?.detail
+        if (Array.isArray(detail)) {
+            return detail.map(e => e.msg || JSON.stringify(e)).join(' / ')
+        }
+        if (typeof detail === 'string') return detail
+        return data?.message || text || 'Error al crear evento'
+    }
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -34,7 +44,7 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
             })
             const text = await res.text()
             const data = text ? JSON.parse(text) : {}
-            if (!res.ok) throw new Error(data?.detail || data?.message || text || 'Error al crear evento')
+            if (!res.ok) throw new Error(extraerMensajeError(data, text))
             setMessage('Evento creado correctamente')
             if (onSuccess) onSuccess(data)
         } catch (err) {
@@ -74,6 +84,7 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
                                 <input
                                     type="date"
                                     value={fecha}
+                                    min={hoy}
                                     onChange={e => setFecha(e.target.value)}
                                     required
                                 />
