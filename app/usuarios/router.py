@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Request, status
 from app.usuarios import schemas, services
+from app.auth import crear_token
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
@@ -23,7 +24,7 @@ def registrar_usuario(usuario: schemas.UsuarioCreate):
 
 @router.post(
     "/login",
-    response_model=schemas.Usuario,
+    response_model=schemas.Token,
     summary="Iniciar sesión",
 )
 def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
@@ -33,5 +34,10 @@ def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email o contraseña incorrectos",
         )
+<<<<<<< HEAD
     request.session["usuario"] = usuario
     return usuario
+=======
+    token = crear_token(usuario["email"])
+    return {"access_token": token, "token_type": "bearer"}
+>>>>>>> c76161036edeac152cb8129694e3530f138f4791
