@@ -1,11 +1,36 @@
 import React, { useState } from 'react'
 import Index from './Index'
 import AuthModal from './AuthModal'
+import CreateEventModal from './Createeventmodal'
+import EventDetailsModal from './EventDetailsModal'
+
+function decodificarEmailDeToken(token) {
+  try {
+    const payload = token.split('.')[1]
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
+    return decoded.sub ?? null
+  } catch {
+    return null
+  }
+}
 
 export default function App() {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
-  const [user, setUser] = useState(null)
+  const [createEventOpen, setCreateEventOpen] = useState(false)
+  const [token, setToken] = useState(() => localStorage.getItem('access_token'))
+  const [user, setUser] = useState(() => {
+    const savedToken = localStorage.getItem('access_token')
+    if (savedToken) {
+      const email = decodificarEmailDeToken(savedToken)
+      if (email) {
+        return { email }
+      }
+    }
+    return null
+  })
+  const [eventosVersion, setEventosVersion] = useState(0)
+  const [selectedEvento, setSelectedEvento] = useState(null)
 
   function openAuth(mode) {
     setAuthMode(mode)
@@ -16,13 +41,28 @@ export default function App() {
     setAuthOpen(false)
   }
 
-  function handleLoginSuccess(userData) {
-    setUser(userData)
-    setAuthOpen(false)
+  function handleLoginSuccess(authData) {
+    const accessToken = authData?.access_token
+    if (accessToken) {
+      localStorage.setItem('access_token', accessToken)
+      setToken(accessToken)
+      setUser({ email: decodificarEmailDeToken(accessToken) })
+      setAuthOpen(false)
+    } else {
+      // Si el registro fue exitoso pero no devolvió token, cambiamos a la pestaña de login
+      setAuthMode('login')
+    }
   }
 
   function handleLogout() {
+    localStorage.removeItem('access_token')
+    setToken(null)
     setUser(null)
+  }
+
+  function handleEventCreated() {
+    setCreateEventOpen(false)
+    setEventosVersion(v => v + 1)
   }
 
   return (
@@ -35,6 +75,7 @@ export default function App() {
           {user ? (
             <>
               <span>Welcome {user.nombre ?? user.email}</span>
+
               <button className="btn-secondary" onClick={handleLogout}>
                 Cerrar sesión
               </button>
@@ -43,7 +84,14 @@ export default function App() {
         </div>
       </header>
       <main>
-        <Index user={user} onShow={openAuth} />
+        <Index
+          key={eventosVersion}
+          user={user}
+          token={token}
+          onShow={openAuth}
+          onCreateEvent={() => setCreateEventOpen(true)}
+          onShowDetails={(evento) => setSelectedEvento(evento)}
+        />
       </main>
       {authOpen && (
         <AuthModal
@@ -51,6 +99,19 @@ export default function App() {
           onClose={closeAuth}
           onSwitch={openAuth}
           onSuccess={handleLoginSuccess}
+        />
+      )}
+      {createEventOpen && (
+        <CreateEventModal
+          token={token}
+          onClose={() => setCreateEventOpen(false)}
+          onSuccess={handleEventCreated}
+        />
+      )}
+      {selectedEvento && (
+        <EventDetailsModal
+          evento={selectedEvento}
+          onClose={() => setSelectedEvento(null)}
         />
       )}
     </div>
