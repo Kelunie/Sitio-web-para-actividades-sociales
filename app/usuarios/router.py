@@ -34,5 +34,5 @@ def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Email o contraseña incorrectos",
         )
-    token = crear_token(usuario["email"])
+    token = crear_token(usuario["email"], usuario.get("nombre"))
     return {"access_token": token, "token_type": "bearer"}

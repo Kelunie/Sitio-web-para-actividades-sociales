@@ -8,9 +8,11 @@ from app.usuarios import services
 security = HTTPBearer()
 
 
-def crear_token(email: str) -> str:
+def crear_token(email: str, nombre: str = None) -> str:
     expira = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {"sub": email, "exp": expira}
+    if nombre:
+        payload["nombre"] = nombre
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
 

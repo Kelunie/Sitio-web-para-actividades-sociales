@@ -42,16 +42,20 @@ class EventoBase(BaseModel):
             raise ValueError("La fecha es obligatoria")
         valor = valor.strip()
         try:
-            fecha_evento = datetime.strptime(valor, "%Y-%m-%d").date()
+            datetime.strptime(valor, "%Y-%m-%d").date()
         except ValueError:
             raise ValueError("La fecha no es válida, debe tener el formato YYYY-MM-DD")
-        if fecha_evento < date.today():
-            raise ValueError("La fecha no puede ser anterior al día de hoy")
         return valor
 
 
 class EventoCreate(EventoBase):
-    pass
+    @field_validator("fecha")
+    @classmethod
+    def validar_fecha_creacion(cls, valor):
+        fecha_evento = datetime.strptime(valor.strip(), "%Y-%m-%d").date()
+        if fecha_evento < date.today():
+            raise ValueError("La fecha no puede ser anterior al día de hoy")
+        return valor
 
 
 class Evento(EventoBase):
