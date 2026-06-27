@@ -31,4 +31,8 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     usuario = services.get_usuario_por_email(email)
     if usuario is None:
         raise credenciales_exception
-    return {"email": usuario["email"], "nombre": usuario["nombre"]}
+    return {
+        "id": str(usuario["_id"]),
+        "email": usuario["email"],
+        "nombre": usuario["nombre"]
+    }

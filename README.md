@@ -132,8 +132,8 @@ El archivo `.env` debe contener los valores de MongoDB que te compartieron para 
 ```
 
 ### `POST /usuarios/login`
-- Descripción: inicia sesión con email y contraseña.
-- La sesión queda guardada en la cookie del navegador para poder crear eventos sin reenviar correo ni id.
+- Descripción: Inicia sesión con email y contraseña, retornando un token JWT.
+- Para las rutas protegidas, se debe enviar este token en la cabecera HTTP `Authorization: Bearer <token>`.
 - Body `application/json`:
 ```json
 {
@@ -141,12 +141,11 @@ El archivo `.env` debe contener los valores de MongoDB que te compartieron para 
   "password": "MiClaveSegura123"
 }
 ```
-- Respuesta exitosa:
+- Respuesta exitosa `200 OK`:
 ```json
 {
-  "id": "647b8f4a...",
-  "nombre": "Juan Pérez",
-  "email": "juan@example.com"
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
 }
 ```
 - Error si las credenciales son inválidas `401 Unauthorized`:
