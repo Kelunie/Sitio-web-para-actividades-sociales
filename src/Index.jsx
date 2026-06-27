@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
   const [eventos, setEventos] = useState([])
+  const [destacado, setDestacado] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -16,6 +17,10 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
         }
         const data = await response.json()
         setEventos(data)
+        if (data && data.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.length)
+          setDestacado(data[randomIndex])
+        }
       } catch (err) {
         setError(err.message)
       } finally {
@@ -33,8 +38,8 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
           <span className="hero-badge">Bienvenido a Eventura</span>
           <h2>Explora eventos, regístrate y accede rápido.</h2>
           <p>
-            Esta vista es un diseño de referencia para el equipo. Actualmente nos
-            concentramos en la US de registro e inicio de sesión.
+            Conéctate con tu comunidad, descubre actividades increíbles a tu alrededor
+            y organiza momentos inolvidables. La aventura de compartir pasiones empieza aquí.
           </p>
           {!user ? (
             <div className="hero-actions">
@@ -47,8 +52,16 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
             </div>
           ) : (
             <div className="hero-user-info">
-              <strong>Welcome {user.nombre ?? user.email}</strong>
-              <p>Ya estás conectado. Explora tus eventos.</p>
+              <div className="user-avatar-badge">
+                <span className="user-avatar-char">
+                  {(user.nombre || user.email || 'U').charAt(0).toUpperCase()}
+                </span>
+                <span className="user-online-status"></span>
+              </div>
+              <div className="user-info-text">
+                <strong>¡Hola, {user.nombre ?? user.email}! 👋</strong>
+                <p>Qué bueno tenerte aquí. Todo listo para descubrir tu próximo evento social.</p>
+              </div>
             </div>
           )}
         </div>
@@ -57,16 +70,33 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
           <div className="hero-card">
             <div className="hero-card-header">
               <span>Evento destacado</span>
-              <strong>Neon Jungle</strong>
+              <strong>{destacado ? (destacado.nombre || destacado.titulo) : 'Neon Jungle'}</strong>
             </div>
             <p>
-              Un diseño de referencia para la pantalla principal mientras avanzamos
-              con login y registro.
+              {destacado ? destacado.descripcion : 'Adéntrate en una noche llena de luces fluorescentes, música electrónica envolvente y una atmósfera electrizante. ¡Asegura tu lugar en la fiesta del año!'}
             </p>
             <div className="hero-stat-row">
-              <span>312 asistentes</span>
-              <span>88 libres</span>
+              {destacado ? (
+                <>
+                  <span>📅 {destacado.fecha}</span>
+                  <span>📍 {destacado.lugar}</span>
+                </>
+              ) : (
+                <>
+                  <span>312 asistentes</span>
+                  <span>88 libres</span>
+                </>
+              )}
             </div>
+            {destacado && (
+              <button 
+                className="btn-secondary" 
+                style={{ marginTop: '1rem', width: '100%', padding: '0.6rem' }}
+                onClick={() => onShowDetails(destacado)}
+              >
+                Ver detalles
+              </button>
+            )}
           </div>
         </div>
       </section>

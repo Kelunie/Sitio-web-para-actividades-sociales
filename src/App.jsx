@@ -4,11 +4,14 @@ import AuthModal from './AuthModal'
 import CreateEventModal from './Createeventmodal'
 import EventDetailsModal from './EventDetailsModal'
 
-function decodificarEmailDeToken(token) {
+function decodificarToken(token) {
   try {
     const payload = token.split('.')[1]
     const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')))
-    return decoded.sub ?? null
+    return {
+      email: decoded.sub ?? null,
+      nombre: decoded.nombre ?? null
+    }
   } catch {
     return null
   }
@@ -22,9 +25,9 @@ export default function App() {
   const [user, setUser] = useState(() => {
     const savedToken = localStorage.getItem('access_token')
     if (savedToken) {
-      const email = decodificarEmailDeToken(savedToken)
-      if (email) {
-        return { email }
+      const decoded = decodificarToken(savedToken)
+      if (decoded && decoded.email) {
+        return decoded
       }
     }
     return null
@@ -46,7 +49,7 @@ export default function App() {
     if (accessToken) {
       localStorage.setItem('access_token', accessToken)
       setToken(accessToken)
-      setUser({ email: decodificarEmailDeToken(accessToken) })
+      setUser(decodificarToken(accessToken))
       setAuthOpen(false)
     } else {
       // Si el registro fue exitoso pero no devolvió token, cambiamos a la pestaña de login
