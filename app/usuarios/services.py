@@ -10,7 +10,11 @@ def _hash_password(password: str) -> str:
 
 
 def get_usuarios():
-    return list(db[COLLECTION_NAME].find({}, {"_id": 0, "password": 0}))
+    usuarios = []
+    for usuario in db[COLLECTION_NAME].find({}, {"password": 0}):
+        usuario["id"] = str(usuario.pop("_id"))
+        usuarios.append(usuario)
+    return usuarios
 
 
 def get_usuario_por_email(email: str):
@@ -18,7 +22,7 @@ def get_usuario_por_email(email: str):
 
 
 def crear_usuario(usuario: schemas.UsuarioCreate):
-    usuario_data = usuario.dict()
+    usuario_data = usuario.model_dump()
     usuario_data["password"] = _hash_password(usuario_data["password"])
     result = db[COLLECTION_NAME].insert_one(usuario_data)
     return {

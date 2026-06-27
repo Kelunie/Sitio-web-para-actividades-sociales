@@ -1,13 +1,10 @@
-# Punto de entrada de la aoplicación
-from fastapi import FastAPI
-from starlette.middleware.sessions import SessionMiddleware
+# Punto de entrada de la aplicación
+from fastapi import FastAPI, HTTPException, status
 from app.actividades.router import router as actividades_router
-from app.config import SECRET_KEY
 from app.usuarios.router import router as usuarios_router
 from app.database import client
 
 app = FastAPI()
-app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 app.include_router(actividades_router)
 app.include_router(usuarios_router)
 
@@ -22,7 +19,10 @@ def health_check():
         client.admin.command('ping')
         return {"status": "ok", "message": "Conexión a la base de datos exitosa"}
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={"status": "error", "message": str(e)}
+        )
 
 @app.get("/health")
 def health():
