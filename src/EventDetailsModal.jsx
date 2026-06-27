@@ -21,7 +21,7 @@ export default function EventDetailsModal({ evento, onClose }) {
         </button>
 
         <div className="auth-modal-top">
-          <div className="auth-icon"></div>
+          <div className="auth-icon">🎉</div>
         </div>
 
         <div className="auth-content">

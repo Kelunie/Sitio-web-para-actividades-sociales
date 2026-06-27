@@ -12,7 +12,7 @@ export default function Register({ onBack, onSuccess }) {
       const res = await fetch('/usuarios/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ nombre: name, email, password })
       })
       const text = await res.text()
       const data = text ? JSON.parse(text) : {}

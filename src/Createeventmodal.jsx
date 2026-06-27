@@ -62,7 +62,7 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
                 </button>
 
                 <div className="auth-modal-top">
-                    <div className="auth-icon"></div>
+                    <div className="auth-icon">📅</div>
                 </div>
 
                 <div className="auth-content">
