@@ -94,21 +94,80 @@ header h1 {
 
 .hero-user-info {
   margin-top: 1.75rem;
-  padding: 1.4rem 1.6rem;
+  padding: 1.5rem;
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(236, 72, 153, 0.05) 100%);
+  border: 1px solid rgba(139, 92, 246, 0.25);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 16px 40px rgba(124, 58, 237, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  animation: pulseBorder 3s infinite alternate;
 }
 
-.hero-user-info strong {
+@keyframes pulseBorder {
+  0% {
+    border-color: rgba(139, 92, 246, 0.25);
+    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.1);
+  }
+  100% {
+    border-color: rgba(236, 72, 153, 0.4);
+    box-shadow: 0 16px 45px rgba(236, 72, 153, 0.15);
+  }
+}
+
+.user-avatar-badge {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(124, 58, 237, 0.35);
+  flex-shrink: 0;
+}
+
+.user-avatar-char {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.user-online-status {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #10b981;
+  border: 2px solid #0b0f1d;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.user-info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.user-info-text strong {
   display: block;
-  font-size: 1.2rem;
-  margin-bottom: 0.4rem;
+  font-size: 1.25rem;
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.hero-user-info p {
+.user-info-text p {
   margin: 0;
+  font-size: 0.95rem;
   color: #c8cbe4;
+  line-height: 1.45;
 }
 
 button {
