@@ -2,15 +2,6 @@ from fastapi import HTTPException, status
 from app.database import db
 from app.actividades import schemas
 
-def get_actividades():
-    # Implementación pendiente del business logic de actividades
-    return []
-
-
-def crear_actividad(actividad):
-    # Implementación pendiente del business logic de actividades
-    return {"detail": "Pendiente implementación"}
-
 
 ACTIVIDADES_COLLECTION_NAME = "actividades"
 EVENTOS_COLLECTION_NAME = "eventos"
@@ -29,7 +20,7 @@ def get_actividades():
 
 
 def crear_actividad(actividad):
-    actividad_data = actividad.dict(exclude_none=True)
+    actividad_data = actividad.model_dump(exclude_none=True)
     result = db[ACTIVIDADES_COLLECTION_NAME].insert_one(actividad_data)
     return {
         "id": str(result.inserted_id),
@@ -45,7 +36,7 @@ def get_eventos():
 
 
 def crear_evento(evento: schemas.EventoCreate, usuario: dict):
-    evento_data = evento.dict(exclude_none=True)
+    evento_data = evento.model_dump(exclude_none=True)
     if not usuario:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
