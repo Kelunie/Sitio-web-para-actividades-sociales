@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { BASE_URL } from './config'
 
 export default function Register({ onBack, onSuccess }) {
   const [name, setName] = useState('')
@@ -9,7 +10,7 @@ export default function Register({ onBack, onSuccess }) {
   async function handleSubmit(e) {
     e.preventDefault()
     try {
-      const res = await fetch('/usuarios/registro', {
+      const res = await fetch(`${BASE_URL}/usuarios/registro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ nombre: name, email, password })
