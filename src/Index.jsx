@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { BASE_URL } from './config'
 
 export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
   const [eventos, setEventos] = useState([])
@@ -11,7 +12,7 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch('/actividades/eventos/')
+        const response = await fetch(`${BASE_URL}/actividades/eventos/`)
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`)
         }
