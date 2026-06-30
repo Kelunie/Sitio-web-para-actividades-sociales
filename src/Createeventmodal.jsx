@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { BASE_URL } from './config'
 
 export default function CreateEventModal({ token, onClose, onSuccess }) {
     const [nombre, setNombre] = useState('')
@@ -34,7 +35,7 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
             }
             if (capacidad) body.capacidad = Number(capacidad)
 
-            const res = await fetch('/actividades/eventos/crear', {
+            const res = await fetch(`${BASE_URL}/actividades/eventos/crear`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

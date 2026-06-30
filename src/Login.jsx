@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { BASE_URL } from './config'
 
 export default function Login({ onBack, onSuccess }) {
   const [email, setEmail] = useState('')
@@ -8,7 +9,7 @@ export default function Login({ onBack, onSuccess }) {
   async function handleSubmit(e) {
     e.preventDefault()
     try {
-      const res = await fetch('/usuarios/login', {
+      const res = await fetch(`${BASE_URL}/usuarios/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
