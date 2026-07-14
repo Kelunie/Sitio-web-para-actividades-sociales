@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Index from './Index'
 import AuthModal from './AuthModal'
 import CreateEventModal from './Createeventmodal'
 import EventDetailsModal from './EventDetailsModal'
+import Perfil from './Perfil'
 
 function decodificarToken(token) {
   try {
@@ -17,7 +19,7 @@ function decodificarToken(token) {
   }
 }
 
-export default function App() {
+function AppShell() {
   const [authOpen, setAuthOpen] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [createEventOpen, setCreateEventOpen] = useState(false)
@@ -63,6 +65,10 @@ export default function App() {
     setUser(null)
   }
 
+  function handleProfileUpdated(usuarioActualizado) {
+    setUser(prev => ({ ...prev, ...usuarioActualizado }))
+  }
+
   function handleEventCreated() {
     setCreateEventOpen(false)
     setEventosVersion(v => v + 1)
@@ -79,6 +85,9 @@ export default function App() {
             <>
               <span>Welcome {user.nombre ?? user.email}</span>
 
+              <Link to="/perfil" className="btn-secondary">
+                Mi perfil
+              </Link>
               <button className="btn-secondary" onClick={handleLogout}>
                 Cerrar sesión
               </button>
@@ -87,14 +96,25 @@ export default function App() {
         </div>
       </header>
       <main>
-        <Index
-          key={eventosVersion}
-          user={user}
-          token={token}
-          onShow={openAuth}
-          onCreateEvent={() => setCreateEventOpen(true)}
-          onShowDetails={(evento) => setSelectedEvento(evento)}
-        />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Index
+                key={eventosVersion}
+                user={user}
+                token={token}
+                onShow={openAuth}
+                onCreateEvent={() => setCreateEventOpen(true)}
+                onShowDetails={(evento) => setSelectedEvento(evento)}
+              />
+            }
+          />
+          <Route
+            path="/perfil"
+            element={<Perfil token={token} onUpdated={handleProfileUpdated} />}
+          />
+        </Routes>
       </main>
       {authOpen && (
         <AuthModal
@@ -118,5 +138,13 @@ export default function App() {
         />
       )}
     </div>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppShell />
+    </BrowserRouter>
   )
 }
