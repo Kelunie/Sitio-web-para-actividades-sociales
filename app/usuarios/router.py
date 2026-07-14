@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from app.usuarios import schemas, services
-from app.auth import crear_token
+from app.auth import crear_token, get_current_user
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
@@ -36,3 +36,28 @@ def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
         )
     token = crear_token(usuario["email"], usuario.get("nombre"))
     return {"access_token": token, "token_type": "bearer"}
+
+@router.get(
+    "/perfil",
+    response_model=schemas.Usuario,
+    summary="Ver perfil del usuario autenticado",
+)
+def ver_perfil(usuario_actual: dict = Depends(get_current_user)):
+    return usuario_actual
+
+@router.put(
+    "/perfil",
+    response_model=schemas.Usuario,
+    summary="Actualizar perfil del usuario autenticado",
+)
+def actualizar_perfil(
+    datos: schemas.UsuarioUpdate,
+    usuario_actual: dict = Depends(get_current_user),
+):
+    try:
+        return services.actualizar_usuario(usuario_actual["email"], datos)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
+        )
