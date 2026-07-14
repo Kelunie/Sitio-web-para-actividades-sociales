@@ -188,6 +188,16 @@ button {
   color: #f5f7ff;
 }
 
+.profile-page {
+  display: flex;
+  justify-content: center;
+  padding-top: 1rem;
+}
+
+.profile-page .auth-modal {
+  position: static;
+}
+
 .auth-modal-overlay {
   position: fixed;
   inset: 0;
