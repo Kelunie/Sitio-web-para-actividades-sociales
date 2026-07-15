@@ -60,6 +60,35 @@ class EventoCreate(EventoBase):
 
 class Evento(EventoBase):
     id: Optional[str] = None
+    asistentes: list[str] = []
+    creado_por: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+
+class EventoUpdate(BaseModel):
+    nombre: Optional[str] = None
+    fecha: Optional[str] = None
+    lugar: Optional[str] = None
+    descripcion: Optional[str] = None
+    capacidad: Optional[int] = None
+    estado: Optional[EstadoEvento] = None
+
+    @field_validator("nombre", "lugar", "descripcion")
+    @classmethod
+    def validar_campos_opcionales(cls, valor, info):
+        if valor is not None and not valor.strip():
+            raise ValueError(f"El campo '{info.field_name}' no puede estar vacío")
+        return valor.strip() if valor is not None else None
+
+    @field_validator("fecha")
+    @classmethod
+    def validar_fecha(cls, valor):
+        if valor is not None:
+            valor = valor.strip()
+            try:
+                datetime.strptime(valor, "%Y-%m-%d").date()
+            except ValueError:
+                raise ValueError("La fecha no es válida, debe tener el formato YYYY-MM-DD")
+        return valor

@@ -37,27 +37,23 @@ def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
     token = crear_token(usuario["email"], usuario.get("nombre"))
     return {"access_token": token, "token_type": "bearer"}
 
+
 @router.get(
     "/perfil",
-    response_model=schemas.Usuario,
-    summary="Ver perfil del usuario autenticado",
+    response_model=schemas.PerfilUsuarioResponse,
+    summary="Ver perfil del usuario con sus eventos creados y asistidos",
 )
-def ver_perfil(usuario_actual: dict = Depends(get_current_user)):
-    return usuario_actual
-
-@router.put(
-    "/perfil",
-    response_model=schemas.Usuario,
-    summary="Actualizar perfil del usuario autenticado",
-)
-def actualizar_perfil(
-    datos: schemas.UsuarioUpdate,
-    usuario_actual: dict = Depends(get_current_user),
+def ver_perfil(
+    current_user: dict = Depends(get_current_user),
 ):
-    try:
-        return services.actualizar_usuario(usuario_actual["email"], datos)
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(error),
-        )
+    from app.actividades import services as actividades_services
+
+    eventos_creados = actividades_services.get_eventos_por_creador(current_user["id"])
+    eventos_asistidos = actividades_services.get_eventos_por_asistente(current_user["id"])
+
+    return {
+        "usuario": current_user,
+        "eventos_creados": eventos_creados,
+        "eventos_asistidos": eventos_asistidos,
+    }
+
