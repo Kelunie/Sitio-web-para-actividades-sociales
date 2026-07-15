@@ -84,7 +84,10 @@ def actualizar_usuario_perfil(usuario_id: str, perfil_update: schemas.PerfilUpda
             detail="Usuario no encontrado",
         )
 
-    update_data = perfil_update.model_dump(exclude_unset=True)
+    update_data = {
+        k: v for k, v in perfil_update.model_dump(exclude_unset=True).items()
+        if v is not None
+    }
 
     # Validar si intenta cambiar el email y si este ya está tomado por otro usuario
     if "email" in update_data and update_data["email"] != usuario["email"]:
@@ -95,9 +98,12 @@ def actualizar_usuario_perfil(usuario_id: str, perfil_update: schemas.PerfilUpda
                 detail="El email ya está registrado por otro usuario",
             )
 
-    # Cifrar password si se está actualizando
+    # Cifrar password si se está actualizando (e ignorar si viene vacía)
     if "password" in update_data:
-        update_data["password"] = _hash_password(update_data["password"])
+        if isinstance(update_data["password"], str) and not update_data["password"].strip():
+            del update_data["password"]
+        else:
+            update_data["password"] = _hash_password(update_data["password"])
 
     if not update_data:
         usuario["id"] = str(usuario.pop("_id"))
