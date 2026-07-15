@@ -28,6 +28,8 @@ class EventoBase(BaseModel):
     descripcion: str
     capacidad: Optional[int] = None
     estado: Optional[EstadoEvento] = "disponible"
+    imagen_url: Optional[str] = None
+
     @field_validator("nombre", "lugar", "descripcion")
     @classmethod
     def campo_obligatorio_no_vacio(cls, valor, info):
@@ -74,6 +76,7 @@ class EventoUpdate(BaseModel):
     descripcion: Optional[str] = None
     capacidad: Optional[int] = None
     estado: Optional[EstadoEvento] = None
+    imagen_url: Optional[str] = None
 
     @field_validator("nombre", "lugar", "descripcion")
     @classmethod
