@@ -37,5 +37,42 @@ def crear_evento(
     return services.crear_evento(evento, usuario)
 
 
+@eventos_router.post(
+    "/{evento_id}/unirse",
+    response_model=schemas.Evento,
+    summary="Unirse a un evento",
+)
+def unirse_a_evento(
+    evento_id: str,
+    usuario=Depends(get_current_user),
+):
+    return services.unirse_a_evento(evento_id, usuario["id"])
+
+
+@eventos_router.put(
+    "/{evento_id}",
+    response_model=schemas.Evento,
+    summary="Editar un evento",
+)
+def editar_evento(
+    evento_id: str,
+    evento_update: schemas.EventoUpdate,
+    usuario=Depends(get_current_user),
+):
+    return services.actualizar_evento(evento_id, evento_update, usuario["id"])
+
+
+@eventos_router.delete(
+    "/{evento_id}",
+    response_model=dict,
+    summary="Eliminar un evento",
+)
+def eliminar_evento(
+    evento_id: str,
+    usuario=Depends(get_current_user),
+):
+    return services.eliminar_evento(evento_id, usuario["id"])
+
+
 router.include_router(eventos_router)
 
