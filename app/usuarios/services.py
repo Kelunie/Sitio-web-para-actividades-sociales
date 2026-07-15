@@ -1,4 +1,6 @@
 import hashlib
+from fastapi import HTTPException, status
+from bson import ObjectId
 from app.database import db
 from app.usuarios import schemas
 
@@ -64,3 +66,52 @@ def autenticar_usuario(email: str, password: str):
         "nombre": usuario.get("nombre"),
         "email": usuario.get("email"),
     }
+
+
+def actualizar_usuario_perfil(usuario_id: str, perfil_update: schemas.PerfilUpdate):
+    try:
+        obj_id = ObjectId(usuario_id)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="ID de usuario inválido",
+        )
+
+    usuario = db[COLLECTION_NAME].find_one({"_id": obj_id})
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado",
+        )
+
+    update_data = perfil_update.model_dump(exclude_unset=True)
+
+    # Validar si intenta cambiar el email y si este ya está tomado por otro usuario
+    if "email" in update_data and update_data["email"] != usuario["email"]:
+        email_duplicado = db[COLLECTION_NAME].find_one({"email": update_data["email"]})
+        if email_duplicado:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="El email ya está registrado por otro usuario",
+            )
+
+    # Cifrar password si se está actualizando
+    if "password" in update_data:
+        update_data["password"] = _hash_password(update_data["password"])
+
+    if not update_data:
+        usuario["id"] = str(usuario.pop("_id"))
+        usuario.pop("password", None)
+        return usuario
+
+    db[COLLECTION_NAME].update_one(
+        {"_id": obj_id},
+        {"$set": update_data}
+    )
+
+    # Obtener el usuario actualizado
+    usuario_actualizado = db[COLLECTION_NAME].find_one({"_id": obj_id})
+    usuario_actualizado["id"] = str(usuario_actualizado.pop("_id"))
+    usuario_actualizado.pop("password", None)
+    return usuario_actualizado
+
