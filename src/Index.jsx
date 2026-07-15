@@ -54,9 +54,13 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
           ) : (
             <div className="hero-user-info">
               <div className="user-avatar-badge">
-                <span className="user-avatar-char">
-                  {(user.nombre || user.email || 'U').charAt(0).toUpperCase()}
-                </span>
+                {user.imagen_url ? (
+                  <img src={user.imagen_url} alt="Profile" className="user-avatar-img" />
+                ) : (
+                  <span className="user-avatar-char">
+                    {(user.nombre || user.email || 'U').charAt(0).toUpperCase()}
+                  </span>
+                )}
                 <span className="user-online-status"></span>
               </div>
               <div className="user-info-text">
@@ -125,6 +129,11 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
           <div className="events-grid">
             {eventos.map(evento => (
               <article key={evento.id || evento._id || evento.titulo} className="event-card">
+                {evento.imagen_url && (
+                  <div className="event-card-banner">
+                    <img src={evento.imagen_url} alt={evento.nombre ?? evento.titulo} />
+                  </div>
+                )}
                 <div className="event-card-top">
                   <span className="event-chip">{evento.categoria ?? 'Evento'}</span>
                   <strong>{evento.titulo ?? evento.nombre ?? 'Evento sin título'}</strong>
