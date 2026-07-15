@@ -57,3 +57,16 @@ def ver_perfil(
         "eventos_asistidos": eventos_asistidos,
     }
 
+
+@router.put(
+    "/perfil",
+    response_model=schemas.Usuario,
+    summary="Actualizar perfil de usuario",
+)
+def actualizar_perfil(
+    perfil_update: schemas.PerfilUpdate,
+    current_user: dict = Depends(get_current_user),
+):
+    return services.actualizar_usuario_perfil(current_user["id"], perfil_update)
+
+

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 from fastapi import HTTPException, status
 from fastapi.requests import Request
 from app.main import root, health
-from app.usuarios.router import listar_usuarios, registrar_usuario, iniciar_sesion, ver_perfil
+from app.usuarios.router import listar_usuarios, registrar_usuario, iniciar_sesion, ver_perfil, actualizar_perfil
 from app.actividades.router import (
     listar_actividades,
     crear_actividad,
@@ -227,6 +227,25 @@ class TestEndpoints(unittest.TestCase):
         
         response = eliminar_evento("60d5ec4b9b0d6542c8d23458", mock_user)
         self.assertEqual(response["mensaje"], "Evento eliminado exitosamente")
+
+    @patch('app.usuarios.router.services')
+    def test_actualizar_perfil(self, mock_services):
+        mock_user = {"id": "user_id", "email": "user@example.com", "nombre": "User"}
+        perfil_update = usuarios_schemas.PerfilUpdate(
+            nombre="User Editado",
+            imagen_url="http://example.com/image.png"
+        )
+        mock_services.actualizar_usuario_perfil.return_value = {
+            "id": "user_id",
+            "nombre": "User Editado",
+            "email": "user@example.com",
+            "imagen_url": "http://example.com/image.png"
+        }
+        
+        response = actualizar_perfil(perfil_update, mock_user)
+        self.assertEqual(response["id"], "user_id")
+        self.assertEqual(response["nombre"], "User Editado")
+        self.assertEqual(response["imagen_url"], "http://example.com/image.png")
 
 if __name__ == "__main__":
     unittest.main()
