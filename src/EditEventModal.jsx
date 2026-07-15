@@ -1,14 +1,14 @@
 import React, { useState } from 'react'
 import { BASE_URL } from './config'
 
-export default function CreateEventModal({ token, onClose, onSuccess }) {
-    const [nombre, setNombre] = useState('')
-    const [fecha, setFecha] = useState('')
-    const [lugar, setLugar] = useState('')
-    const [descripcion, setDescripcion] = useState('')
-    const [capacidad, setCapacidad] = useState('')
-    const [estado, setEstado] = useState('disponible')
-    const [imagenUrl, setImagenUrl] = useState('')
+export default function EditEventModal({ token, evento, onClose, onSuccess }) {
+    const [nombre, setNombre] = useState(evento?.nombre ?? '')
+    const [fecha, setFecha] = useState(evento?.fecha ?? '')
+    const [lugar, setLugar] = useState(evento?.lugar ?? '')
+    const [descripcion, setDescripcion] = useState(evento?.descripcion ?? '')
+    const [capacidad, setCapacidad] = useState(evento?.capacidad ?? '')
+    const [estado, setEstado] = useState(evento?.estado ?? 'disponible')
+    const [imagenUrl, setImagenUrl] = useState(evento?.imagen_url ?? '')
     const [message, setMessage] = useState(null)
     const [submitting, setSubmitting] = useState(false)
     const hoy = new Date().toISOString().split('T')[0]
@@ -19,7 +19,7 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
             return detail.map(e => e.msg || JSON.stringify(e)).join(' / ')
         }
         if (typeof detail === 'string') return detail
-        return data?.message || text || 'Error al crear evento'
+        return data?.message || text || 'Error al actualizar evento'
     }
 
     function handleImageChange(e) {
@@ -72,12 +72,12 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
                 lugar,
                 descripcion,
                 estado,
+                imagen_url: imagenUrl || null,
             }
-            if (capacidad) body.capacidad = Number(capacidad)
-            if (imagenUrl) body.imagen_url = imagenUrl
+            body.capacidad = capacidad ? Number(capacidad) : null
 
-            const res = await fetch(`${BASE_URL}/actividades/eventos/crear`, {
-                method: 'POST',
+            const res = await fetch(`${BASE_URL}/actividades/eventos/${evento.id}`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
@@ -88,8 +88,12 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
             const data = text ? JSON.parse(text) : {}
             if (!res.ok) throw new Error(extraerMensajeError(data, text))
             
-            setMessage('Evento creado correctamente')
-            if (onSuccess) onSuccess(data)
+            setMessage('Evento actualizado correctamente')
+            if (onSuccess) {
+                setTimeout(() => {
+                    onSuccess(data)
+                }, 1000)
+            }
         } catch (err) {
             setMessage(err.message)
         } finally {
@@ -105,12 +109,12 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
                 </button>
 
                 <div className="auth-modal-top">
-                    <div className="auth-icon">📅</div>
+                    <div className="auth-icon">📝</div>
                 </div>
 
                 <div className="auth-content">
-                    <h2>Crear evento</h2>
-                    <p>Comparte un nuevo evento con la comunidad</p>
+                    <h2>Editar evento</h2>
+                    <p>Actualiza la información de tu evento</p>
                     <form onSubmit={handleSubmit}>
                         <label>
                             Nombre del evento
@@ -199,7 +203,7 @@ export default function CreateEventModal({ token, onClose, onSuccess }) {
                             />
                         </label>
                         <button type="submit" className="btn-primary" disabled={submitting}>
-                            {submitting ? 'Creando...' : 'Crear evento'}
+                            {submitting ? 'Guardando...' : 'Guardar cambios'}
                         </button>
                     </form>
                     {message && <p className="auth-message">{message}</p>}
