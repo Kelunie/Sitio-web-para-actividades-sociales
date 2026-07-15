@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from app.usuarios import schemas, services
-from app.auth import crear_token
+from app.auth import crear_token, get_current_user
 
 router = APIRouter(prefix="/usuarios", tags=["usuarios"])
 
@@ -36,3 +36,24 @@ def iniciar_sesion(credentials: schemas.UsuarioLogin, request: Request):
         )
     token = crear_token(usuario["email"], usuario.get("nombre"))
     return {"access_token": token, "token_type": "bearer"}
+
+
+@router.get(
+    "/perfil",
+    response_model=schemas.PerfilUsuarioResponse,
+    summary="Ver perfil del usuario con sus eventos creados y asistidos",
+)
+def ver_perfil(
+    current_user: dict = Depends(get_current_user),
+):
+    from app.actividades import services as actividades_services
+
+    eventos_creados = actividades_services.get_eventos_por_creador(current_user["id"])
+    eventos_asistidos = actividades_services.get_eventos_por_asistente(current_user["id"])
+
+    return {
+        "usuario": current_user,
+        "eventos_creados": eventos_creados,
+        "eventos_asistidos": eventos_asistidos,
+    }
+

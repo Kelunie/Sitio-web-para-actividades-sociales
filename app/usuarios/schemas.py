@@ -21,3 +21,12 @@ class Usuario(UsuarioBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+from app.actividades.schemas import Evento
+
+class PerfilUsuarioResponse(BaseModel):
+    usuario: Usuario
+    eventos_creados: list[Evento]
+    eventos_asistidos: list[Evento]
+
