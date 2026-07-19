@@ -34,24 +34,6 @@ def crear_usuario(usuario: schemas.UsuarioCreate):
     }
 
 
-def actualizar_usuario(email: str, datos: schemas.UsuarioUpdate):
-    cambios = {k: v for k, v in datos.model_dump(exclude_unset=True).items() if v is not None}
-
-    if "email" in cambios and cambios["email"] != email:
-        if get_usuario_por_email(cambios["email"]):
-            raise ValueError("El email ya está registrado")
-
-    if cambios:
-        db[COLLECTION_NAME].update_one({"email": email}, {"$set": cambios})
-
-    usuario = get_usuario_por_email(cambios.get("email", email))
-    return {
-        "id": str(usuario["_id"]),
-        "nombre": usuario["nombre"],
-        "email": usuario["email"],
-    }
-
-
 def autenticar_usuario(email: str, password: str):
     usuario = get_usuario_por_email(email)
     if not usuario:
