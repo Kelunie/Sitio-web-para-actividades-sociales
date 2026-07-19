@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import APIRouter, Depends, status
 from app.auth import get_current_user
 from app.actividades import schemas, services
@@ -20,8 +21,8 @@ eventos_router = APIRouter(prefix="/eventos", tags=["eventos"])
 
 
 @eventos_router.get("/", response_model=list[schemas.Evento], summary="Listar eventos")
-def listar_eventos():
-    return services.get_eventos()
+def listar_eventos(q: Optional[str] = None):
+    return services.get_eventos(q)
 
 
 @eventos_router.post(

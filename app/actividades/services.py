@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 from bson import ObjectId
+from typing import Optional
 from app.database import db
 from app.actividades import schemas
 
@@ -30,9 +31,13 @@ def crear_actividad(actividad):
     }
 
 
-def get_eventos():
+def get_eventos(busqueda: Optional[str] = None):
+    filtro = {}
+    if busqueda:
+        filtro = {"nombre": {"$regex": busqueda.strip(), "$options": "i"}}
+
     eventos = []
-    for evento in db[EVENTOS_COLLECTION_NAME].find({}):
+    for evento in db[EVENTOS_COLLECTION_NAME].find(filtro):
         eventos.append(_serializar_documento(evento))
     return eventos
 
