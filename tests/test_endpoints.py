@@ -152,6 +152,26 @@ class TestEndpoints(unittest.TestCase):
         self.assertEqual(response[0]["id"], "60d5ec4b9b0d6542c8d23458")
         self.assertEqual(response[0]["nombre"], "Evento")
 
+    @patch('app.actividades.services.db')
+    def test_buscar_eventos_por_nombre(self, mock_db):
+        mock_db.__getitem__.return_value.find.return_value = [
+            {
+                "_id": ObjectId("60d5ec4b9b0d6542c8d23458"),
+                "nombre": "Fiesta de bienvenida",
+                "fecha": "2026-07-01",
+                "lugar": "Lugar",
+                "descripcion": "Desc",
+                "capacidad": 10,
+                "estado": "disponible"
+            }
+        ]
+        response = listar_eventos(q="fiesta")
+        mock_db.__getitem__.return_value.find.assert_called_with(
+            {"nombre": {"$regex": "fiesta", "$options": "i"}}
+        )
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]["nombre"], "Fiesta de bienvenida")
+
     @patch('app.actividades.router.services')
     def test_crear_evento(self, mock_services):
         evento_in = actividades_schemas.EventoCreate(
