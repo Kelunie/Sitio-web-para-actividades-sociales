@@ -62,6 +62,15 @@ def editar_evento(
     return services.actualizar_evento(evento_id, evento_update, usuario["id"])
 
 
+@eventos_router.get(
+    "/{evento_id}/asistentes",
+    response_model=list[schemas.Asistente],
+    summary="Ver asistentes de un evento",
+)
+def listar_asistentes(evento_id: str):
+    return services.get_asistentes_evento(evento_id)
+
+
 @eventos_router.delete(
     "/{evento_id}",
     response_model=dict,

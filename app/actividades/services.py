@@ -6,6 +6,7 @@ from app.actividades import schemas
 
 ACTIVIDADES_COLLECTION_NAME = "actividades"
 EVENTOS_COLLECTION_NAME = "eventos"
+USUARIOS_COLLECTION_NAME = "usuarios"
 
 
 def _serializar_documento(documento):
@@ -148,6 +149,31 @@ def get_eventos_por_creador(usuario_id: str):
     for evento in db[EVENTOS_COLLECTION_NAME].find({"creado_por": usuario_id}):
         eventos.append(_serializar_documento(evento))
     return eventos
+
+
+def get_asistentes_evento(evento_id: str):
+    evento = get_evento_por_id(evento_id)
+    if not evento:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Evento no encontrado",
+        )
+
+    asistentes_ids = evento.get("asistentes", [])
+    if not asistentes_ids:
+        return []
+
+    object_ids = [ObjectId(usuario_id) for usuario_id in asistentes_ids]
+    asistentes = []
+    for usuario in db[USUARIOS_COLLECTION_NAME].find(
+        {"_id": {"$in": object_ids}}, {"password": 0}
+    ):
+        asistentes.append({
+            "id": str(usuario["_id"]),
+            "nombre": usuario.get("nombre"),
+            "email": usuario.get("email"),
+        })
+    return asistentes
 
 
 def get_eventos_por_asistente(usuario_id: str):

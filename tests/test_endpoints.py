@@ -12,7 +12,9 @@ from app.actividades.router import (
     unirse_a_evento,
     editar_evento,
     eliminar_evento,
+    listar_asistentes,
 )
+from app.actividades.services import get_asistentes_evento
 from app.usuarios import schemas as usuarios_schemas
 from app.actividades import schemas as actividades_schemas
 from bson import ObjectId
@@ -227,6 +229,24 @@ class TestEndpoints(unittest.TestCase):
         
         response = eliminar_evento("60d5ec4b9b0d6542c8d23458", mock_user)
         self.assertEqual(response["mensaje"], "Evento eliminado exitosamente")
+
+    @patch('app.actividades.router.services')
+    def test_listar_asistentes(self, mock_services):
+        mock_services.get_asistentes_evento.return_value = [
+            {"id": "user_id", "nombre": "User", "email": "user@example.com"}
+        ]
+
+        response = listar_asistentes("60d5ec4b9b0d6542c8d23458")
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]["nombre"], "User")
+
+    @patch('app.actividades.services.db')
+    def test_listar_asistentes_evento_no_encontrado(self, mock_db):
+        mock_db.__getitem__.return_value.find_one.return_value = None
+
+        with self.assertRaises(HTTPException) as context:
+            get_asistentes_evento("60d5ec4b9b0d6542c8d23458")
+        self.assertEqual(context.exception.status_code, status.HTTP_404_NOT_FOUND)
 
     @patch('app.usuarios.router.services')
     def test_actualizar_perfil(self, mock_services):
