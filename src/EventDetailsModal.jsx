@@ -1,9 +1,22 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { BASE_URL } from './config'
 
 export default function EventDetailsModal({ evento, token, user, onClose, onJoinSuccess }) {
   const [message, setMessage] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [asistentes, setAsistentes] = useState([])
+  const [cargandoAsistentes, setCargandoAsistentes] = useState(false)
+
+  useEffect(() => {
+    if (!evento) return
+
+    setCargandoAsistentes(true)
+    fetch(`${BASE_URL}/actividades/eventos/${evento.id}/asistentes`)
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setAsistentes(data))
+      .catch(() => setAsistentes([]))
+      .finally(() => setCargandoAsistentes(false))
+  }, [evento?.id])
 
   if (!evento) return null
 
@@ -108,6 +121,23 @@ export default function EventDetailsModal({ evento, token, user, onClose, onJoin
                 <span style={{ color: '#c8cbe4', fontSize: '0.95rem' }}> {evento.creado_por}</span>
               </div>
             )}
+
+            <div>
+              <strong style={{ color: '#dcd7ff', display: 'block', marginBottom: '0.25rem' }}>
+                Asistentes {asistentes.length > 0 ? `(${asistentes.length})` : ''}
+              </strong>
+              {cargandoAsistentes ? (
+                <span style={{ color: '#c8cbe4' }}>Cargando asistentes...</span>
+              ) : asistentes.length === 0 ? (
+                <span style={{ color: '#c8cbe4' }}>Todavía nadie se unió a este evento.</span>
+              ) : (
+                <ul style={{ margin: 0, paddingLeft: '1.2rem', color: '#c8cbe4' }}>
+                  {asistentes.map(asistente => (
+                    <li key={asistente.id}>{asistente.nombre}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
 
           {message && <p className="auth-message" style={{ margin: '0 0 1rem 0', textAlign: 'center' }}>{message}</p>}
