@@ -6,19 +6,21 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
   const [destacado, setDestacado] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [busqueda, setBusqueda] = useState('')
 
   useEffect(() => {
     async function loadEventos() {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch(`${BASE_URL}/actividades/eventos/`)
+        const query = busqueda.trim() ? `?q=${encodeURIComponent(busqueda.trim())}` : ''
+        const response = await fetch(`${BASE_URL}/actividades/eventos/${query}`)
         if (!response.ok) {
           throw new Error(`Error ${response.status}: ${response.statusText}`)
         }
         const data = await response.json()
         setEventos(data)
-        if (data && data.length > 0) {
+        if (!busqueda.trim() && data && data.length > 0) {
           const randomIndex = Math.floor(Math.random() * data.length)
           setDestacado(data[randomIndex])
         }
@@ -29,8 +31,9 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
       }
     }
 
-    loadEventos()
-  }, [])
+    const timeoutId = setTimeout(loadEventos, 300)
+    return () => clearTimeout(timeoutId)
+  }, [busqueda])
 
   return (
     <>
@@ -119,12 +122,24 @@ export default function Index({ user, onShow, onCreateEvent, onShowDetails }) {
           )}
         </div>
 
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Buscar eventos por nombre..."
+          value={busqueda}
+          onChange={e => setBusqueda(e.target.value)}
+        />
+
         {loading ? (
           <p>Cargando eventos...</p>
         ) : error ? (
           <p className="error-message">No se pudieron cargar los eventos: {error}</p>
         ) : eventos.length === 0 ? (
-          <p>No hay eventos disponibles por el momento.</p>
+          <p>
+            {busqueda.trim()
+              ? `No se encontraron eventos que coincidan con "${busqueda.trim()}".`
+              : 'No hay eventos disponibles por el momento.'}
+          </p>
         ) : (
           <div className="events-grid">
             {eventos.map(evento => (
