@@ -334,6 +334,22 @@ button {
   color: rgba(255, 255, 255, 0.4);
 }
 
+.search-input {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fafc;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
 .auth-modal select {
   width: 100%;
   border: 1px solid rgba(255, 255, 255, 0.12);
