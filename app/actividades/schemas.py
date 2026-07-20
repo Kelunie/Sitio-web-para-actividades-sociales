@@ -69,6 +69,12 @@ class Evento(EventoBase):
         from_attributes = True
 
 
+class Asistente(BaseModel):
+    id: str
+    nombre: str
+    email: Optional[str] = None
+
+
 class EventoUpdate(BaseModel):
     nombre: Optional[str] = None
     fecha: Optional[str] = None
